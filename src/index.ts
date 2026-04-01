@@ -11,6 +11,10 @@ let bird: Phaser.Physics.Arcade.Sprite;
 let upperPipe: Phaser.Physics.Arcade.Sprite;
 let lowerPipe: Phaser.Physics.Arcade.Sprite;
 
+const pipeVerticalDistanceRange = [150, 250];
+// @ts-ignore
+let pipVerticalDistance = Phaser.Math.Between(...pipeVerticalDistanceRange);
+
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   width: gameWidth,
@@ -44,7 +48,7 @@ function create(this: Phaser.Scene): void {
 
   upperPipe = this.physics.add.sprite(pipeX, 100, "pipe").setOrigin(0, 1);
   lowerPipe = this.physics.add
-    .sprite(pipeX, upperPipe.y + pipeGap, "pipe")
+    .sprite(pipeX, pipVerticalDistance, "pipe")
     .setOrigin(0, 0);
 
   this.input.on("pointerdown", flap);
