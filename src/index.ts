@@ -22,20 +22,16 @@ const config: Phaser.Types.Core.GameConfig = {
 
 const flapVelocity = 250;
 const initialBirdPosition = { x: gameWidth * 0.1, y: gameHeight / 2 };
-const pipeX = 400;
-const pipeGap = 100;
+
+const VELOCITY = 200;
+const PIPES_TO_RENDER = 4;
 
 let bird: Phaser.Physics.Arcade.Sprite;
 let upperPipe: Phaser.Physics.Arcade.Sprite;
 let lowerPipe: Phaser.Physics.Arcade.Sprite;
+let pipeHorizontalDistance = 0;
 
 const pipeVerticalDistanceRange = [150, 250];
-// @ts-ignore
-let pipVerticalDistance = Phaser.Math.Between(...pipeVerticalDistanceRange);
-let pipVerticalPosition = Phaser.Math.Between(
-  0 + 20,
-  (config.height as number) - 20 - pipVerticalDistance,
-);
 
 function preload(this: Phaser.Scene) {
   this.load.image("sky", "assets/sky.png");
@@ -51,12 +47,28 @@ function create(this: Phaser.Scene): void {
     .setOrigin(0);
   bird.setGravityY(400);
 
-  upperPipe = this.physics.add
-    .sprite(pipeX, pipVerticalPosition, "pipe")
-    .setOrigin(0, 1);
-  lowerPipe = this.physics.add
-    .sprite(pipeX, upperPipe.y + pipVerticalDistance, "pipe")
-    .setOrigin(0, 0);
+  for (let i = 0; i < PIPES_TO_RENDER; i++) {
+    pipeHorizontalDistance += 400;
+    const pipVerticalDistance = Phaser.Math.Between(
+      // @ts-ignore
+      ...pipeVerticalDistanceRange,
+    );
+
+    const pipVerticalPosition = Phaser.Math.Between(
+      0 + 20,
+      (config.height as number) - 20 - pipVerticalDistance,
+    );
+
+    upperPipe = this.physics.add
+      .sprite(pipeHorizontalDistance, pipVerticalPosition, "pipe")
+      .setOrigin(0, 1);
+    lowerPipe = this.physics.add
+      .sprite(upperPipe.x, upperPipe.y + pipVerticalDistance, "pipe")
+      .setOrigin(0, 0);
+
+    upperPipe.setVelocityX(-200);
+    lowerPipe.setVelocityX(-200);
+  }
 
   this.input.on("pointerdown", flap);
   this.input.keyboard?.on("keydown_SPACE", flap);
