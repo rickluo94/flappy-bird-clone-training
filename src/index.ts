@@ -66,8 +66,8 @@ function create(this: Phaser.Scene): void {
       .sprite(upperPipe.x, upperPipe.y + pipVerticalDistance, "pipe")
       .setOrigin(0, 0);
 
-    upperPipe.setVelocityX(-200);
-    lowerPipe.setVelocityX(-200);
+    upperPipe.setVelocityX(-VELOCITY);
+    lowerPipe.setVelocityX(-VELOCITY);
   }
 
   this.input.on("pointerdown", flap);
