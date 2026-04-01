@@ -2,18 +2,6 @@ import Phaser from "phaser";
 
 const gameWidth = 800;
 const gameHeight = 600;
-const flapVelocity = 250;
-const initialBirdPosition = { x: gameWidth * 0.1, y: gameHeight / 2 };
-const pipeX = 400;
-const pipeGap = 100;
-
-let bird: Phaser.Physics.Arcade.Sprite;
-let upperPipe: Phaser.Physics.Arcade.Sprite;
-let lowerPipe: Phaser.Physics.Arcade.Sprite;
-
-const pipeVerticalDistanceRange = [150, 250];
-// @ts-ignore
-let pipVerticalDistance = Phaser.Math.Between(...pipeVerticalDistanceRange);
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -32,6 +20,23 @@ const config: Phaser.Types.Core.GameConfig = {
   },
 };
 
+const flapVelocity = 250;
+const initialBirdPosition = { x: gameWidth * 0.1, y: gameHeight / 2 };
+const pipeX = 400;
+const pipeGap = 100;
+
+let bird: Phaser.Physics.Arcade.Sprite;
+let upperPipe: Phaser.Physics.Arcade.Sprite;
+let lowerPipe: Phaser.Physics.Arcade.Sprite;
+
+const pipeVerticalDistanceRange = [150, 250];
+// @ts-ignore
+let pipVerticalDistance = Phaser.Math.Between(...pipeVerticalDistanceRange);
+let pipVerticalPosition = Phaser.Math.Between(
+  0 + 20,
+  (config.height as number) - 20 - pipVerticalDistance,
+);
+
 function preload(this: Phaser.Scene) {
   this.load.image("sky", "assets/sky.png");
   this.load.image("bird", "assets/bird.png");
@@ -46,9 +51,11 @@ function create(this: Phaser.Scene): void {
     .setOrigin(0);
   bird.setGravityY(400);
 
-  upperPipe = this.physics.add.sprite(pipeX, 100, "pipe").setOrigin(0, 1);
+  upperPipe = this.physics.add
+    .sprite(pipeX, pipVerticalPosition, "pipe")
+    .setOrigin(0, 1);
   lowerPipe = this.physics.add
-    .sprite(pipeX, pipVerticalDistance, "pipe")
+    .sprite(pipeX, upperPipe.y + pipVerticalDistance, "pipe")
     .setOrigin(0, 0);
 
   this.input.on("pointerdown", flap);
