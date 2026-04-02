@@ -24,6 +24,8 @@ const flapVelocity = 250;
 const initialBirdPosition = { x: gameWidth * 0.1, y: gameHeight / 2 };
 
 const VELOCITY = 200;
+// const GRAVITY_Y = 400;
+const GRAVITY_Y = 0;
 const PIPES_TO_RENDER = 4;
 
 let bird: Phaser.Physics.Arcade.Sprite;
@@ -44,7 +46,7 @@ function create(this: Phaser.Scene): void {
   bird = this.physics.add
     .sprite(initialBirdPosition.x, initialBirdPosition.y, "bird")
     .setOrigin(0);
-  bird.setGravityY(400);
+  bird.setGravityY(GRAVITY_Y);
 
   pipes = this.physics.add.group();
 
@@ -66,6 +68,8 @@ function update(): void {
   if (bird.y > gameHeight || bird.y < -bird.height) {
     restartBirdPosition();
   }
+
+  recyclePipes();
 }
 
 function placePipe(
@@ -107,6 +111,21 @@ function getRightMostPipe(): number {
 function restartBirdPosition(): void {
   bird.setPosition(initialBirdPosition.x, initialBirdPosition.y);
   bird.setVelocityY(0);
+}
+
+function recyclePipes(): void {
+  let tempPipes = [] as Phaser.Physics.Arcade.Sprite[];
+  const pipeChildren = (pipes?.getChildren() ??
+    []) as Phaser.Physics.Arcade.Sprite[];
+
+  pipeChildren.forEach((pip) => {
+    if (pip.getBounds().right <= 0) {
+      tempPipes.push(pip);
+      if (tempPipes.length == 2) {
+        placePipe(tempPipes[0], tempPipes[1]);
+      }
+    }
+  });
 }
 
 function flap(): void {
