@@ -27,11 +27,10 @@ const VELOCITY = 200;
 const PIPES_TO_RENDER = 4;
 
 let bird: Phaser.Physics.Arcade.Sprite;
-let upperPipe: Phaser.Physics.Arcade.Sprite;
-let lowerPipe: Phaser.Physics.Arcade.Sprite;
-let pipeHorizontalDistance = 0;
+let pipes: Phaser.Physics.Arcade.Group | null = null;
 
 const pipeVerticalDistanceRange = [150, 250];
+const pipeHorizontalDistanceRange = [500, 550];
 
 function preload(this: Phaser.Scene) {
   this.load.image("sky", "assets/sky.png");
@@ -47,28 +46,17 @@ function create(this: Phaser.Scene): void {
     .setOrigin(0);
   bird.setGravityY(400);
 
+  pipes = this.physics.add.group();
+
   for (let i = 0; i < PIPES_TO_RENDER; i++) {
-    pipeHorizontalDistance += 400;
-    const pipVerticalDistance = Phaser.Math.Between(
-      // @ts-ignore
-      ...pipeVerticalDistanceRange,
-    );
+    const upperPipe = pipes.create(0, 0, "pipe").setOrigin(0, 1);
 
-    const pipVerticalPosition = Phaser.Math.Between(
-      0 + 20,
-      (config.height as number) - 20 - pipVerticalDistance,
-    );
+    const lowerPipe = pipes.create(0, 0, "pipe").setOrigin(0, 0);
 
-    upperPipe = this.physics.add
-      .sprite(pipeHorizontalDistance, pipVerticalPosition, "pipe")
-      .setOrigin(0, 1);
-    lowerPipe = this.physics.add
-      .sprite(upperPipe.x, upperPipe.y + pipVerticalDistance, "pipe")
-      .setOrigin(0, 0);
-
-    upperPipe.setVelocityX(-VELOCITY);
-    lowerPipe.setVelocityX(-VELOCITY);
+    placePipe(upperPipe, lowerPipe);
   }
+
+  pipes.setVelocityX(-VELOCITY);
 
   this.input.on("pointerdown", flap);
   this.input.keyboard?.on("keydown_SPACE", flap);
@@ -78,6 +66,42 @@ function update(): void {
   if (bird.y > gameHeight || bird.y < -bird.height) {
     restartBirdPosition();
   }
+}
+
+function placePipe(
+  uPipe: Phaser.Physics.Arcade.Sprite,
+  lPipe: Phaser.Physics.Arcade.Sprite,
+) {
+  const rightMostX = getRightMostPipe();
+  const pipVerticalDistance = Phaser.Math.Between(
+    // @ts-ignore
+    ...pipeVerticalDistanceRange,
+  );
+
+  const pipVerticalPosition = Phaser.Math.Between(
+    0 + 20,
+    (config.height as number) - 20 - pipVerticalDistance,
+  );
+
+  const pipeHorizontalDistance = Phaser.Math.Between(
+    // @ts-ignore
+    ...pipeHorizontalDistanceRange,
+  );
+
+  uPipe.x = rightMostX + pipeHorizontalDistance;
+  uPipe.y = pipVerticalPosition;
+
+  lPipe.x = uPipe.x;
+  lPipe.y = uPipe.y + pipVerticalDistance;
+}
+
+function getRightMostPipe(): number {
+  const pipeChildren = (pipes?.getChildren() ??
+    []) as Phaser.Physics.Arcade.Sprite[];
+
+  return pipeChildren.reduce((rightMostX, pipe) => {
+    return Math.max(rightMostX, pipe.x);
+  }, 0);
 }
 
 function restartBirdPosition(): void {
