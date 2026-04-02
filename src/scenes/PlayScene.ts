@@ -11,6 +11,9 @@ class PlayScene extends Phaser.Scene {
   private pipesToRender = 4;
   private pipeVerticalDistanceRange = [150, 250];
   private pipeHorizontalDistanceRange = [500, 550];
+  private mountainsBack?: Phaser.GameObjects.TileSprite;
+  private mountainsMid1?: Phaser.GameObjects.TileSprite;
+  private mountainsMid2?: Phaser.GameObjects.TileSprite;
 
   constructor(config: SharedConfig) {
     super("PlayScene");
@@ -18,6 +21,9 @@ class PlayScene extends Phaser.Scene {
   }
 
   preload() {
+    this.load.image("mountains-back", "assets/mountains-back.png");
+    this.load.image("mountains-mid1", "assets/mountains-mid1.png");
+    this.load.image("mountains-mid2", "assets/mountains-mid2.png");
     this.load.image("sky", "assets/sky.png");
     this.load.image("bird", "assets/bird.png");
     this.load.image("pipe", "assets/pipe.png");
@@ -25,6 +31,36 @@ class PlayScene extends Phaser.Scene {
 
   create() {
     this.add.image(0, 0, "sky").setOrigin(0);
+
+    this.mountainsBack = this.add
+      .tileSprite(
+        0,
+        this.config.height - this.textures.getFrame("mountains-back").height,
+        this.config.width,
+        this.textures.getFrame("mountains-back").height,
+        "mountains-back",
+      )
+      .setOrigin(0, 0);
+
+    this.mountainsMid1 = this.add
+      .tileSprite(
+        0,
+        this.config.height - this.textures.getFrame("mountains-mid1").height,
+        this.config.width,
+        this.textures.getFrame("mountains-mid1").height,
+        "mountains-mid1",
+      )
+      .setOrigin(0, 0);
+
+    this.mountainsMid2 = this.add
+      .tileSprite(
+        0,
+        this.config.height - this.textures.getFrame("mountains-mid2").height,
+        this.config.width,
+        this.textures.getFrame("mountains-mid2").height,
+        "mountains-mid2",
+      )
+      .setOrigin(0, 0);
 
     this.bird = this.physics.add
       .sprite(this.config.startPosition.x, this.config.startPosition.y, "bird")
@@ -49,6 +85,10 @@ class PlayScene extends Phaser.Scene {
 
   update(time: number, delta: number) {
     super.update(time, delta);
+
+    this!.mountainsBack!.tilePositionX += 0.05;
+    this!.mountainsMid1!.tilePositionX += 0.3;
+    this!.mountainsMid2!.tilePositionX += 0.75;
 
     if (!this.bird) {
       console.log("update bird", undefined);
