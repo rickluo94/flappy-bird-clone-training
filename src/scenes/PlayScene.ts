@@ -43,8 +43,8 @@ class PlayScene extends Phaser.Scene {
 
     this.pipes.setVelocityX(-this.velocity);
 
-    this.input.on("pointerdown", this.flap);
-    this.input.keyboard?.on("keydown_SPACE", this.flap);
+    this.input.on("pointerdown", () => this.flap);
+    this.input.keyboard?.on("keydown_SPACE", () => this.flap);
   }
 
   update(time: number, delta: number) {
@@ -55,10 +55,7 @@ class PlayScene extends Phaser.Scene {
       return;
     }
 
-    if (
-      this.bird.y > this.config.gameHeight ||
-      this.bird.y < -this.bird.height
-    ) {
+    if (this.bird.y > this.config.height || this.bird.y < -this.bird.height) {
       this.restartBirdPosition();
     }
 
@@ -77,7 +74,7 @@ class PlayScene extends Phaser.Scene {
 
     const pipVerticalPosition = Phaser.Math.Between(
       0 + 20,
-      (this.config.gameHeight as number) - 20 - pipVerticalDistance,
+      (this.config.height as number) - 20 - pipVerticalDistance,
     );
 
     const pipeHorizontalDistance = Phaser.Math.Between(

@@ -8,8 +8,8 @@ const GAME_HEIGHT = 600;
 const BIRD_POSITION = { x: GAME_WIDTH * 0.1, y: GAME_HEIGHT / 2 };
 
 const SHARED_CONFIG: SharedConfig = {
-  gameWidth: GAME_WIDTH,
-  gameHeight: GAME_HEIGHT,
+  width: GAME_WIDTH,
+  height: GAME_HEIGHT,
   startPosition: BIRD_POSITION,
 };
 

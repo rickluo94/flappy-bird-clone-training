@@ -1,6 +1,6 @@
 export type SharedConfig = {
-  gameWidth: number;
-  gameHeight: number;
+  width: number;
+  height: number;
   startPosition: {
     x: number;
     y: number;
