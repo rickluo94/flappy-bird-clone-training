@@ -1,31 +1,36 @@
 import Phaser from "phaser";
 
-const gameWidth = 800;
-const gameHeight = 600;
+import PlayScene from "./scenes/PlayScene";
+import type { SharedConfig } from "./types/sharedConfig";
+
+const GAME_WIDTH = 800;
+const GAME_HEIGHT = 600;
+const BIRD_POSITION = { x: GAME_WIDTH * 0.1, y: GAME_HEIGHT / 2 };
+const VELOCITY = 200;
+const GRAVITY_Y = 0;
+const FLAP_VELOCITY = 250;
+
+const SHARED_CONFIG: SharedConfig = {
+  width: GAME_WIDTH,
+  height: GAME_HEIGHT,
+  startPosition: BIRD_POSITION,
+  velocity: VELOCITY,
+  gravityY: GRAVITY_Y,
+  flapVelocity: FLAP_VELOCITY,
+};
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
-  width: gameWidth,
-  height: gameHeight,
+  ...SHARED_CONFIG,
   physics: {
     default: "arcade",
     arcade: {
       debug: true,
     },
   },
-  scene: {
-    preload,
-    create,
-    update,
-  },
+  scene: [new PlayScene(SHARED_CONFIG)],
 };
 
-const flapVelocity = 250;
-const initialBirdPosition = { x: gameWidth * 0.1, y: gameHeight / 2 };
-
-const VELOCITY = 200;
-// const GRAVITY_Y = 400;
-const GRAVITY_Y = 0;
 const PIPES_TO_RENDER = 4;
 
 let bird: Phaser.Physics.Arcade.Sprite;
@@ -44,7 +49,7 @@ function create(this: Phaser.Scene): void {
   this.add.image(0, 0, "sky").setOrigin(0);
 
   bird = this.physics.add
-    .sprite(initialBirdPosition.x, initialBirdPosition.y, "bird")
+    .sprite(BIRD_POSITION.x, BIRD_POSITION.y, "bird")
     .setOrigin(0);
   bird.setGravityY(GRAVITY_Y);
 
@@ -65,7 +70,7 @@ function create(this: Phaser.Scene): void {
 }
 
 function update(): void {
-  if (bird.y > gameHeight || bird.y < -bird.height) {
+  if (bird.y > GAME_HEIGHT || bird.y < -bird.height) {
     restartBirdPosition();
   }
 
@@ -109,7 +114,7 @@ function getRightMostPipe(): number {
 }
 
 function restartBirdPosition(): void {
-  bird.setPosition(initialBirdPosition.x, initialBirdPosition.y);
+  bird.setPosition(BIRD_POSITION.x, BIRD_POSITION.y);
   bird.setVelocityY(0);
 }
 
@@ -129,7 +134,7 @@ function recyclePipes(): void {
 }
 
 function flap(): void {
-  bird.setVelocityY(-flapVelocity);
+  bird.setVelocityY(-FLAP_VELOCITY);
 }
 
 new Phaser.Game(config);
